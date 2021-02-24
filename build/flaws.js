@@ -16,7 +16,6 @@ const { FLAW_LEVELS } = require("./constants");
 const { packageBCD } = require("./resolve-bcd");
 const {
   findMatchesInText,
-  findFirstMatchInText,
   replaceMatchesInText,
 } = require("./matches-in-text");
 const { humanFileSize } = require("./utils");
@@ -337,9 +336,10 @@ function injectPreTagFlaws(level, doc, $, rawContent) {
     const flaw = { explanation, id, fixable, html, suggestion, type };
     if (fixable) {
       // Only if it's fixable, is the `html` perfectly findable in the raw content.
-      const { line, column } = findFirstMatchInText(html, rawContent);
-      flaw.line = line;
-      flaw.column = column;
+      for (const { line, column } of findMatchesInText(html, rawContent)) {
+        flaw.line = line;
+        flaw.column = column;
+      }
     }
 
     // Actually mutate the cheerio instance so we benefit from the
